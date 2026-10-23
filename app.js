@@ -544,10 +544,18 @@ function renderHistory() {
     const date = new Date(item.smashedAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
     list.append(el("li", {}, [
       el("span", { className: "h-emoji", textContent: item.emoji }),
-      el("span", {}, [
+      el("span", { className: "h-text" }, [
         el("span", { className: "h-name", textContent: item.name }),
         el("span", { className: "h-meta", textContent: `${item.goal} coins · ${date}` }),
       ]),
+      el("button", {
+        className: "task-icon-btn",
+        type: "button",
+        ariaLabel: `Remove ${item.name} from your treats`,
+        title: "Remove",
+        textContent: "×",
+        onclick: () => removeTreat(item),
+      }),
     ]));
   }
 }
@@ -604,6 +612,20 @@ function undoTask(jar, task) {
   save();
   render();
   toast(`Undone. ${task.coins} coins taken back.`);
+}
+
+async function removeTreat(item) {
+  const ok = await askChoice({
+    emoji: item.emoji,
+    text: `Remove "${item.name}" from your treats?`,
+    yes: "Remove",
+    no: "Keep it",
+  });
+  if (!ok) return;
+  state.history = state.history.filter((h) => h !== item);
+  save();
+  render();
+  toast("Treat removed");
 }
 
 async function deleteTask(jar, task) {

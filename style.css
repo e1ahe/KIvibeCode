@@ -630,6 +630,7 @@ button, input { font: inherit; color: inherit; }
   padding: 10px 12px;
 }
 .history-list .h-emoji { font-size: 1.6rem; }
+.history-list .h-text { flex: 1; min-width: 0; }
 .history-list .h-name { font-weight: 600; display: block; }
 .history-list .h-meta { font-size: 0.8rem; color: var(--muted); }
 
