@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <title>GirlMath</title>
   <meta name="description" content="Earn gold coins by doing little tasks, fill your piggy banks and shop guilt-free.">
   <meta name="theme-color" content="#ffe4ef">
@@ -13,9 +13,28 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- Sparkly splash on load; tap to skip -->
+  <div class="splash" id="splash" aria-hidden="true">
+    <div class="splash-inner">
+      <div class="splash-pig">
+        🐷
+        <span class="sp s1">✨</span>
+        <span class="sp s2">✨</span>
+        <span class="sp s3">💖</span>
+        <span class="sp s4">✨</span>
+        <span class="sp s5">⭐</span>
+        <span class="sp s6">✨</span>
+      </div>
+      <div class="splash-title">Girl<span>Math</span></div>
+      <div class="splash-tag">earn it, then buy it ✨</div>
+    </div>
+  </div>
+
   <header class="top">
     <h1 class="logo">Girl<span>Math</span> <span class="logo-pig">🐷</span></h1>
     <p class="tagline">It's not spending if you earned it ✨</p>
+    <button class="corner-btn left" id="soundBtn" type="button" aria-label="Sound on">🔊</button>
+    <button class="corner-btn right info" id="infoBtn" type="button" aria-label="How GirlMath works">i</button>
   </header>
 
   <main class="app">
@@ -23,11 +42,9 @@
 
     <!-- Shown when there are no jars yet -->
     <section class="card empty" id="emptyState" hidden>
-      <div class="empty-pig">🐷</div>
-      <h2>Hi bestie!</h2>
-      <p>Make a piggy bank for something you want, add little to-dos, and earn gold coins every time you finish one.</p>
-      <p class="muted">When the jar is full, you've officially earned it. That's just math. 💅</p>
-      <button class="btn btn-primary" id="emptyNewJar">Create my first jar</button>
+      <div class="ghost-jar"><span>🐷</span></div>
+      <p>No jars yet. What are you saving for? 💖</p>
+      <button class="btn btn-primary" id="emptyNewJar">+ New jar</button>
     </section>
 
     <div class="jar-view" id="jarView" hidden>
@@ -36,32 +53,40 @@
           <span class="jar-emoji" id="jarEmoji"></span>
           <div class="jar-title">
             <h2 id="jarName"></h2>
-            <p class="muted" id="jarGoalText"></p>
+            <p class="muted" id="jarSub"></p>
           </div>
           <button class="icon-btn" id="editJarBtn" aria-label="Edit this jar">✏️</button>
+          <button class="icon-btn" id="deleteJarHeadBtn" aria-label="Delete this jar">🗑️</button>
         </div>
 
-        <div class="jar-wrap">
+        <div class="jar-wrap" id="jarWrap">
+          <div class="jar-sparkles" aria-hidden="true">
+            <span>✨</span><span>⭐</span><span>✨</span><span>💖</span><span>✨</span>
+          </div>
           <div class="jar-lid"><span>🐷</span></div>
           <div class="jar" id="jar">
-            <div class="jar-fill" id="jarFill"></div>
-            <div class="jar-count">
-              <strong id="jarCoins">0</strong>
-              <span>🪙 coins</span>
-            </div>
+            <div class="jar-pile" id="jarPile"></div>
+            <svg class="crack-layer" viewBox="0 0 170 200" preserveAspectRatio="none" aria-hidden="true">
+              <g class="crack"><path d="M120 28 L104 54 L112 70 L95 96"/><path d="M104 54 L84 48"/></g>
+              <g class="crack"><path d="M38 58 L60 80 L52 100 L70 120"/><path d="M60 80 L82 74"/></g>
+              <g class="crack"><path d="M95 96 L80 120 L90 140 L70 172"/><path d="M90 140 L118 150"/></g>
+              <g class="crack"><path d="M152 108 L126 120 L131 140 L110 162"/><path d="M18 138 L45 134 L50 162"/></g>
+            </svg>
           </div>
+          <div class="tap-finger" aria-hidden="true">👆</div>
         </div>
+
+        <p class="jar-amount"><strong id="jarCoins">0</strong> / <span id="jarGoal">0</span> 🪙</p>
 
         <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="progressBar">
           <div class="progress-fill" id="progressFill"></div>
         </div>
         <p class="cheer" id="cheer"></p>
-        <button class="btn btn-gold" id="smashBtn" hidden>🔨 Smash the jar!</button>
+        <p class="smash-hint" id="smashHint" hidden></p>
       </section>
 
       <section class="card tasks-card">
         <h3>To-dos for this jar</h3>
-        <p class="muted small">Tap a to-do when it's done to drop the coins in. Tap again to undo.</p>
         <ul class="task-list" id="taskList"></ul>
 
         <div class="suggestions" id="suggestions">
@@ -77,8 +102,8 @@
               <input type="number" id="taskCoins" min="1" max="10000" value="20" required aria-label="Coins this to-do earns">
             </label>
             <label class="toggle">
-              <input type="checkbox" id="taskDaily">
-              <span>Every day</span>
+              <input type="checkbox" id="taskRepeat">
+              <span>🔁 Repeat</span>
             </label>
             <button class="btn btn-primary" type="submit">Add</button>
           </div>
@@ -120,10 +145,39 @@
     </form>
   </dialog>
 
+  <!-- Yes/no question -->
+  <dialog class="sheet confirm" id="confirmDialog">
+    <div class="confirm-emoji" id="confirmEmoji">🥺</div>
+    <p id="confirmText"></p>
+    <div class="sheet-actions center">
+      <button type="button" class="btn btn-ghost" id="confirmCancel" hidden>Cancel</button>
+      <button type="button" class="btn btn-ghost" id="confirmNo">Keep it</button>
+      <button type="button" class="btn btn-danger" id="confirmYes">Delete</button>
+    </div>
+  </dialog>
+
+  <!-- How it works -->
+  <dialog class="sheet" id="infoDialog">
+    <h2>How GirlMath works ✨</h2>
+    <ol class="how-list">
+      <li><span>🐷</span><p><b>Make a jar</b> for something you want, and choose how many coins fill it.</p></li>
+      <li><span>📝</span><p><b>Add to-dos</b> to that jar and decide how many coins each one earns.</p></li>
+      <li><span>🪙</span><p><b>Tap a to-do</b> when it's done and watch the coins drop in. 🔁 Repeat to-dos can be tapped again and again.</p></li>
+      <li><span>🔨</span><p><b>Tap the full jar</b> again and again until it smashes, then treat yourself, guilt-free!</p></li>
+    </ol>
+    <p class="muted small">Coins are just for fun, not real money. Everything is saved on this device only.</p>
+    <div class="sheet-actions center">
+      <button type="button" class="btn btn-primary" id="infoClose">Got it!</button>
+    </div>
+  </dialog>
+
   <!-- Celebration after smashing -->
   <dialog class="sheet celebrate" id="celebrateDialog">
-    <div class="celebrate-emoji" id="celebrateEmoji">🎉</div>
-    <h2>You did it!</h2>
+    <div class="celebrate-top">
+      <div class="rays" aria-hidden="true"></div>
+      <div class="celebrate-emoji" id="celebrateEmoji">🎉</div>
+    </div>
+    <h2 class="shine">SMASHED IT! 🎉</h2>
     <p id="celebrateText"></p>
     <p class="muted">Girl math says it's basically free now. Enjoy it! 💖</p>
     <button class="btn btn-primary" id="celebrateClose">Yay!</button>
