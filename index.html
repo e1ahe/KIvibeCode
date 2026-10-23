@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>GirlMath</title>
+  <meta name="description" content="Earn gold coins by doing little tasks, fill your piggy banks and shop guilt-free.">
+  <meta name="theme-color" content="#ffe4ef">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐷</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <h1 class="logo">Girl<span>Math</span> <span class="logo-pig">🐷</span></h1>
+    <p class="tagline">It's not spending if you earned it ✨</p>
+  </header>
+
+  <main class="app">
+    <nav class="jar-tabs" id="jarTabs" aria-label="Your piggy banks"></nav>
+
+    <!-- Shown when there are no jars yet -->
+    <section class="card empty" id="emptyState" hidden>
+      <div class="empty-pig">🐷</div>
+      <h2>Hi bestie!</h2>
+      <p>Make a piggy bank for something you want, add little to-dos, and earn gold coins every time you finish one.</p>
+      <p class="muted">When the jar is full, you've officially earned it. That's just math. 💅</p>
+      <button class="btn btn-primary" id="emptyNewJar">Create my first jar</button>
+    </section>
+
+    <div class="jar-view" id="jarView" hidden>
+      <section class="card jar-card">
+        <div class="jar-head">
+          <span class="jar-emoji" id="jarEmoji"></span>
+          <div class="jar-title">
+            <h2 id="jarName"></h2>
+            <p class="muted" id="jarGoalText"></p>
+          </div>
+          <button class="icon-btn" id="editJarBtn" aria-label="Edit this jar">✏️</button>
+        </div>
+
+        <div class="jar-wrap">
+          <div class="jar-lid"><span>🐷</span></div>
+          <div class="jar" id="jar">
+            <div class="jar-fill" id="jarFill"></div>
+            <div class="jar-count">
+              <strong id="jarCoins">0</strong>
+              <span>🪙 coins</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="progressBar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <p class="cheer" id="cheer"></p>
+        <button class="btn btn-gold" id="smashBtn" hidden>🔨 Smash the jar!</button>
+      </section>
+
+      <section class="card tasks-card">
+        <h3>To-dos for this jar</h3>
+        <p class="muted small">Tap a to-do when it's done to drop the coins in. Tap again to undo.</p>
+        <ul class="task-list" id="taskList"></ul>
+
+        <div class="suggestions" id="suggestions">
+          <p class="muted small">Need ideas? Tap to add:</p>
+          <div class="chips" id="suggestionChips"></div>
+        </div>
+
+        <form class="task-form" id="taskForm" autocomplete="off">
+          <input type="text" id="taskName" placeholder="New to-do, e.g. Tidy my room" maxlength="60" required>
+          <div class="task-form-row">
+            <label class="coin-input">
+              <span>🪙</span>
+              <input type="number" id="taskCoins" min="1" max="10000" value="20" required aria-label="Coins this to-do earns">
+            </label>
+            <label class="toggle">
+              <input type="checkbox" id="taskDaily">
+              <span>Every day</span>
+            </label>
+            <button class="btn btn-primary" type="submit">Add</button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <section class="card history" id="history" hidden>
+      <h3>Treats you earned 💅</h3>
+      <ul class="history-list" id="historyList"></ul>
+    </section>
+  </main>
+
+  <!-- Create / edit jar -->
+  <dialog class="sheet" id="jarDialog">
+    <form method="dialog" id="jarForm" autocomplete="off">
+      <h2 id="jarDialogTitle">New piggy bank</h2>
+      <label class="field">
+        <span>What are you saving for?</span>
+        <input type="text" id="jarNameInput" placeholder="e.g. New sneakers" maxlength="40" required>
+      </label>
+      <div class="field">
+        <span>Pick a cute icon</span>
+        <div class="emoji-picker" id="emojiPicker"></div>
+      </div>
+      <label class="field">
+        <span>How many coins to fill the jar?</span>
+        <div class="coin-input big">
+          <span>🪙</span>
+          <input type="number" id="jarGoalInput" min="1" max="100000" value="500" required>
+        </div>
+      </label>
+      <div class="sheet-actions">
+        <button type="button" class="btn btn-ghost danger" id="deleteJarBtn" hidden>Delete jar</button>
+        <span class="spacer"></span>
+        <button type="button" class="btn btn-ghost" id="cancelJarBtn">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Celebration after smashing -->
+  <dialog class="sheet celebrate" id="celebrateDialog">
+    <div class="celebrate-emoji" id="celebrateEmoji">🎉</div>
+    <h2>You did it!</h2>
+    <p id="celebrateText"></p>
+    <p class="muted">Girl math says it's basically free now. Enjoy it! 💖</p>
+    <button class="btn btn-primary" id="celebrateClose">Yay!</button>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
